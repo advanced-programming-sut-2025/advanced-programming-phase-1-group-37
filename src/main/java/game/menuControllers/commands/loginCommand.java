@@ -14,9 +14,11 @@ public class loginCommand implements command {
     private final MenuView View;
     private final MenuManager Menus;
 
-    public loginCommand(userManager users,
-                        MenuView view,
-                        MenuManager menus) {
+    public loginCommand(
+            userManager users,
+            MenuView view,
+            MenuManager menus
+    ) {
         this.Users = users;
         this.View  = view;
         this.Menus = menus;
@@ -32,16 +34,17 @@ public class loginCommand implements command {
 
         if (Users.Authenticate(u, p)) {
             View.ShowMessage("✔ Welcome back, " + u + "!");
-            // ask stay-logged-in
+
+            // **SET the current user here** so userInfoCommand won't NPE
+            Menus.setCurrentUser(u);
+
             String stay = View.Prompt("Stay logged in? (y/n): ").trim();
-            if ("y".equalsIgnoreCase(stay)) {
-                // persist to session.txt
+            if (stay.equalsIgnoreCase("y")) {
                 try (FileWriter fw = new FileWriter("session.txt")) {
                     fw.write(u);
                 } catch (IOException e) {
                     View.ShowMessage("Warning: could not save session.");
                 }
-                View.ShowMessage("You will remain logged in on next launch.");
             }
             Menus.SwitchToMainMenu();
         } else {

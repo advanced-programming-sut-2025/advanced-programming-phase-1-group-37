@@ -5,6 +5,8 @@ import game.menuControllers.commands.*;
 import game.models.userManager;
 import game.view.MenuView;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,70 +16,131 @@ public class MenuManager {
     private final MenuView View;
     private final userManager Users;
     private Menu CurrentMenu;
+    private String CurrentUser;
 
     private final Menu AuthMenu;
     private final Menu MainMenu;
+    private final Menu ProfileMenu;
 
     public MenuManager(MenuView View, userManager Users) {
         this.View  = View;
         this.Users = Users;
 
-        this.AuthMenu = BuildAuthMenu();
-        this.MainMenu = BuildMainMenu();
+        this.AuthMenu    = buildAuthMenu();
+        this.MainMenu    = buildMainMenu();
+        this.ProfileMenu = buildProfileMenu();
 
-        // start in login/register
         this.CurrentMenu = AuthMenu;
-        View.DisplayMenu(CurrentMenu.GetMenuName(),
-                CurrentMenu.GetCommands().keySet());
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
     }
 
-    private Menu BuildAuthMenu() {
+    private Menu buildAuthMenu() {
         Map<String, command> cmds = new LinkedHashMap<>();
-        cmds.put("register",        new registerCommand(Users, View));
-        cmds.put("login",           new loginCommand(Users, View, this));
-        cmds.put("forget password", new forgetPasswordCommand(Users, View));
-        cmds.put("enter menu",      new enterMenuCommand(this, View));
-        cmds.put("exit",            new ExitCommand());
+        cmds.put("register",         new registerCommand(Users, View));
+        cmds.put("login",            new loginCommand(Users, View, this));
+        cmds.put("forget password",  new forgetPasswordCommand(Users, View));
+        cmds.put("enter menu",       new enterMenuCommand(this, View));
+        cmds.put("show menu",        new showCurrentMenuCommand(this, View));
+        cmds.put("exit",             new ExitCommand());
         return new Menu("Login/Register", cmds);
     }
 
-    private Menu BuildMainMenu() {
+    private Menu buildMainMenu() {
         Map<String, command> cmds = new LinkedHashMap<>();
-        cmds.put("enter menu", new enterMenuCommand(this, View));
-        cmds.put("menu",       new showCurrentMenuCommand(this, View));
-        // … other main‐menu commands …
-        cmds.put("exit",       new ExitCommand());
+        cmds.put("enter menu",     new enterMenuCommand(this, View));
+        cmds.put("show menu",      new showCurrentMenuCommand(this, View));
+        cmds.put("user logout",    new userLogoutCommand(this, View));
+        cmds.put("exit",           new ExitCommand());
         return new Menu("Main", cmds);
     }
 
-    /** Called by loginCommand on success */
+    private Menu buildProfileMenu() {
+        Map<String, command> cmds = new LinkedHashMap<>();
+        cmds.put("change username", new changeUsernameCommand(Users, View, this));
+        cmds.put("change nickname", new changeNicknameCommand(Users, View, this));
+        cmds.put("change email",    new changeEmailCommand(Users, View, this));
+        cmds.put("change password", new changePasswordCommand(Users, View, this));
+        cmds.put("user info",       new userInfoCommand(Users, View, this));
+        cmds.put("enter menu",      new enterMenuCommand(this, View));    // moved before show menu
+        cmds.put("show menu",       new showCurrentMenuCommand(this, View));
+        cmds.put("exit",            new ExitCommand());
+        return new Menu("Profile", cmds);
+    }
+
+    public void setCurrentUser(String username) {
+        this.CurrentUser = username;
+    }
+
     public void SwitchToMainMenu() {
         this.CurrentMenu = MainMenu;
-        View.DisplayMenu(CurrentMenu.GetMenuName(),
-                CurrentMenu.GetCommands().keySet());
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+    }
+
+    public void SwitchToProfileMenu() {
+        this.CurrentMenu = ProfileMenu;
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
     }
 
     public void EnterMenu(String name) {
-        if ("Login/Register".equalsIgnoreCase(name)) {
-            View.ShowMessage("you can't go there from here!");
-        } else if ("Main".equalsIgnoreCase(name)) {
-            if (CurrentMenu == AuthMenu) {
+        String cur = CurrentMenu.GetMenuName();
+
+        if ("Login/Register".equals(cur)) {
+            if (matchesAny(name, "main", "game", "profile", "avatar", "register/login")) {
                 View.ShowMessage("you can't go there from here!");
             } else {
-                CurrentMenu = MainMenu;
-                View.DisplayMenu(CurrentMenu.GetMenuName(),
-                        CurrentMenu.GetCommands().keySet());
+                View.ShowMessage("menu doesn't exist!");
             }
-        } else {
-            View.ShowMessage("menu doesn't exist!");
+            return;
         }
+
+        if ("Main".equals(cur)) {
+            switch (name.toLowerCase()) {
+                case "profile":
+                    SwitchToProfileMenu(); return;
+                case "game":
+                case "avatar":
+                    View.ShowMessage("you can't go there from here!");
+                    return;
+                case "main":
+                case "register/login":
+                    View.ShowMessage("you can't go there from here!");
+                    return;
+                default:
+                    View.ShowMessage("menu doesn't exist!");
+                    return;
+            }
+        }
+
+        if ("Profile".equals(cur)) {
+            // Profile Menu allows entering only "main"
+            if ("main".equalsIgnoreCase(name)) {
+                SwitchToMainMenu();
+            } else {
+                View.ShowMessage("you can't go there from here!");
+            }
+        }
+    }
+
+    private boolean matchesAny(String input, String... options) {
+        for (String o : options) {
+            if (o.equalsIgnoreCase(input)) return true;
+        }
+        return false;
+    }
+
+    public void Logout() {
+        try { Files.deleteIfExists(Path.of("session.txt")); }
+        catch (Exception ignored) {}
+        this.CurrentUser = null;
+        this.CurrentMenu = AuthMenu;
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
     }
 
     public void Start() {
         boolean running = true;
         while (running) {
-            String line = View.Prompt("> ");
-            command cmd = CurrentMenu.GetCommands().get(line.trim());
+            String line = View.Prompt("> ").trim();
+            command cmd = CurrentMenu.GetCommands().get(line);
             if (cmd != null) {
                 running = cmd.Execute(new String[]{ line });
             } else {
@@ -89,5 +152,10 @@ public class MenuManager {
 
     public String ShowCurrentMenu() {
         return CurrentMenu.GetMenuName();
+    }
+
+    /** Returns the currently logged-in username */
+    public String getCurrentUser() {
+        return CurrentUser;
     }
 }

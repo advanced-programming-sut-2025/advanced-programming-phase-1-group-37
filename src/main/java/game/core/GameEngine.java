@@ -10,29 +10,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class GameEngine {
-    public static void main(String[] args) {
-        // 1) load users
+    public static void main(String[] args) throws Exception {
         userManager users = new userManager();
-        // 2) prepare view
-        MenuView view = new consoleMenuView();
-        // 3) build menus
-        MenuManager menus = new MenuManager(view, users);
+        MenuView view    = new consoleMenuView();
+        MenuManager menus= new MenuManager(view, users);
 
-        // 4) check for saved “stay-logged-in” session
-        Path sessionFile = Path.of("session.txt");
-        if (Files.exists(sessionFile)) {
-            try {
-                String savedUser = Files.readString(sessionFile, StandardCharsets.UTF_8).trim();
-                if (users.GetUser(savedUser) != null) {
-                    view.ShowMessage("Auto-logged in as “" + savedUser + "”.");
-                    menus.SwitchToMainMenu();
-                }
-            } catch (Exception ignored) {
-                // if anything goes wrong, just ignore and start at login
+        // Auto‐login if session.txt exists
+        Path session = Path.of("session.txt");
+        if (Files.exists(session)) {
+            String saved = Files.readString(session, StandardCharsets.UTF_8).trim();
+            if (users.GetUser(saved) != null) {
+                view.ShowMessage("Auto‐logged in as “" + saved + "”.");
+                menus.setCurrentUser(saved);
+                menus.SwitchToMainMenu();
             }
         }
 
-        // 5) start interaction loop
         menus.Start();
     }
 }

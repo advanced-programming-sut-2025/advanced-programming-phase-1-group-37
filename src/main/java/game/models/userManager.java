@@ -8,11 +8,16 @@ import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class userManager {
     private static final String USER_FILE = "users.json";
     private final Map<String, user> Users = new HashMap<>();
     private final Gson gson = new Gson();
+
+    // reuse the same email‐validation pattern from registerCommand
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*@[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*\\.[A-Za-z]{2,}$");
 
     public userManager() {
         loadUsers();
@@ -28,6 +33,7 @@ public class userManager {
             String SecurityAnswer
     ) {
         if (Users.containsKey(Username)) return false;
+        if (!EMAIL_PATTERN.matcher(Email).matches()) return false;
         String hash = hashPassword(PlainPassword);
         Users.put(Username, new user(
                 Username, hash, Email, Gender, Nickname,
@@ -46,7 +52,6 @@ public class userManager {
         return Users.get(Username);
     }
 
-    /** Resets the user’s password to a new one‐way‐hashed value. */
     public boolean ResetPassword(String Username, String PlainPassword) {
         user old = Users.get(Username);
         if (old == null) return false;
@@ -60,6 +65,66 @@ public class userManager {
         return true;
     }
 
+    public boolean ChangeUsername(String oldUsername, String newUsername) {
+        if (!Users.containsKey(oldUsername)) return false;
+        if (Users.containsKey(newUsername)) return false;
+
+        user u = Users.remove(oldUsername);
+        // update the username field inside the user object
+        user updated = new user(
+                newUsername,
+                u.GetPasswordHash(),
+                u.GetEmail(),
+                u.GetGender(),
+                u.GetNickname(),
+                u.GetSecurityQuestionIndex(),
+                u.GetSecurityAnswer()
+        );
+        Users.put(newUsername, updated);
+        saveUsers();
+        return true;
+    }
+
+    public void ChangeNickname(String Username, String newNickname) {
+        user u = Users.get(Username);
+        if (u == null) return;
+        user updated = new user(
+                u.GetUsername(),
+                u.GetPasswordHash(),
+                u.GetEmail(),
+                u.GetGender(),
+                newNickname,
+                u.GetSecurityQuestionIndex(),
+                u.GetSecurityAnswer()
+        );
+        Users.put(Username, updated);
+        saveUsers();
+    }
+
+    public boolean UpdateEmail(String Username, String newEmail) {
+        if (!EMAIL_PATTERN.matcher(newEmail).matches()) return false;
+        // ensure no other user uses it
+        for (user u : Users.values()) {
+            if (u.GetEmail().equalsIgnoreCase(newEmail)) {
+                return false;
+            }
+        }
+        user old = Users.get(Username);
+        if (old == null) return false;
+        user updated = new user(
+                old.GetUsername(),
+                old.GetPasswordHash(),
+                newEmail,
+                old.GetGender(),
+                old.GetNickname(),
+                old.GetSecurityQuestionIndex(),
+                old.GetSecurityAnswer()
+        );
+        Users.put(Username, updated);
+        saveUsers();
+        return true;
+    }
+
     private void loadUsers() {
         File f = new File(USER_FILE);
         if (!f.exists()) return;
@@ -68,7 +133,7 @@ public class userManager {
             Map<String, user> loaded = gson.fromJson(r, t);
             if (loaded != null) Users.putAll(loaded);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load users.json", e);
+            throw new RuntimeException("Failed to load " + USER_FILE, e);
         }
     }
 
@@ -76,7 +141,7 @@ public class userManager {
         try (Writer w = new FileWriter(USER_FILE)) {
             gson.toJson(Users, w);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save users.json", e);
+            throw new RuntimeException("Failed to save " + USER_FILE, e);
         }
     }
 
@@ -88,7 +153,7 @@ public class userManager {
             for (byte b : dig) sb.append(String.format("%02x", b));
             return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("SHA-256 not available", e);
+            throw new RuntimeException("SHA-256 unavailable", e);
         }
     }
 }
