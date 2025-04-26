@@ -10,6 +10,8 @@ public class user {
     private String Nickname;
     private int SecurityQuestionIndex;
     private String SecurityAnswer;
+    private long HighestBalance = 0;
+    private int NumberOfGamesPlayed = 0;
 
     public user() {}
 
@@ -36,4 +38,6 @@ public class user {
     public String   GetNickname()             { return Nickname; }
     public int      GetSecurityQuestionIndex(){ return SecurityQuestionIndex; }
     public String   GetSecurityAnswer()       { return SecurityAnswer; }
+    public long   GetHighestBalance() { return HighestBalance; }
+    public int   GetNumberOfGamesPlayed() { return NumberOfGamesPlayed; }
 }

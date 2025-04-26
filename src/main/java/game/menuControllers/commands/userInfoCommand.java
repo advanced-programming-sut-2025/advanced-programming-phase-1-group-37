@@ -22,8 +22,8 @@ public class userInfoCommand implements command {
         var usr = Users.GetUser(u);
         View.ShowMessage("Username: " + usr.GetUsername());
         View.ShowMessage("Nickname: " + usr.GetNickname());
-        View.ShowMessage("Email:    " + usr.GetEmail());
-        View.ShowMessage("Gender:   " + usr.GetGender());
+        View.ShowMessage("highest balance in a game: " + usr.GetHighestBalance());
+        View.ShowMessage("number of games played: " + usr.GetNumberOfGamesPlayed());
         return true;
     }
 }
