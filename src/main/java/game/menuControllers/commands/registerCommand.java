@@ -12,21 +12,25 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class registerCommand implements command {
-//    private static final Pattern USERNAME_PATTERN =
-//            Pattern.compile("^[A-Za-z0-9_-]{1,8}$");
-//    private static final Pattern EMAIL_PATTERN =
-//            Pattern.compile("^[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*@[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*\\.[A-Za-z]{2,}$");
-private static final Pattern USERNAME_PATTERN =
-        Pattern.compile("^[A-Za-z0-9\\-]{1,50}$");
+    // allow any length for username, letters/digits/_/-
+    private static final Pattern USERNAME_PATTERN =
+            Pattern.compile("^[A-Za-z0-9_-]+$");
     private static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*@[A-Za-z0-9_\\-]+(\\.[A-Za-z0-9_\\-]+)*\\.[A-Za-z]{2,}$");
-    // special chars allowed:
     private static final String SPECIALS = "?!><,\"':\\\\/\\|\\]\\[\\}\\{\\+=\\)\\(\\*&\\^%\\$#\\!";
     private static final int MIN_LENGTH = 8;
 
     private final userManager Users;
     private final MenuView View;
     private final Random Rand = new SecureRandom();
+
+    private final List<String> QUESTIONS = List.of(
+            "What is your mother's maiden name?",
+            "What was the name of your first pet?",
+            "What city were you born in?",
+            "What was your first school?",
+            "What is your favorite food?"
+    );
 
     public registerCommand(userManager users, MenuView view) {
         this.Users = users;
@@ -39,7 +43,7 @@ private static final Pattern USERNAME_PATTERN =
         String u = promptUsername();
         if (u == null) return true;
 
-        // Password (generate or manual)
+        // Password
         String p = promptPassword();
         if (p == null) return true;
 
@@ -55,8 +59,33 @@ private static final Pattern USERNAME_PATTERN =
         String n = promptOrExit("Nickname: ");
         if (n == null) return true;
 
-        // Register
-        if (Users.RegisterUser(u, p, e, g, n)) {
+        // Security question selection
+        View.ShowMessage("Security questions:");
+        for (int i = 0; i < QUESTIONS.size(); i++) {
+            View.ShowMessage((i+1) + ". " + QUESTIONS.get(i));
+        }
+        int qIndex;
+        while (true) {
+            String sel = View.Prompt("Select question (1-" + QUESTIONS.size() + "): ").trim();
+            if ("exit".equalsIgnoreCase(sel)) { View.ShowMessage("Operation cancelled."); return true; }
+            try {
+                qIndex = Integer.parseInt(sel);
+                if (qIndex >= 1 && qIndex <= QUESTIONS.size()) break;
+            } catch (Exception ignored) {}
+            View.ShowMessage("Invalid selection.");
+        }
+
+        // Security answer
+        String answer;
+        while (true) {
+            answer = View.Prompt("Answer: ");
+            if ("exit".equalsIgnoreCase(answer)) { View.ShowMessage("Operation cancelled."); return true; }
+            if (!answer.isBlank()) break;
+            View.ShowMessage("Answer cannot be blank.");
+        }
+
+        // Final register call
+        if (Users.RegisterUser(u, p, e, g, n, qIndex-1, answer)) {
             View.ShowMessage("✔ Registered \"" + u + "\" successfully.");
         } else {
             View.ShowMessage("✘ Registration failed.");
@@ -69,14 +98,13 @@ private static final Pattern USERNAME_PATTERN =
             String u = promptOrExit("Username: ");
             if (u == null) return null;
             if (!USERNAME_PATTERN.matcher(u).matches()) {
-//                View.ShowMessage("Invalid username: 1-8 chars; letters, digits, - or _ only.");
-                View.ShowMessage("Invalid username: letters, digits, - only.");
+                View.ShowMessage("Invalid username: letters, digits, '_' or '-' only.");
                 continue;
             }
             if (Users.GetUser(u) == null) {
                 return u;
             }
-            // suggest
+            // suggest alternative
             String suggestion;
             do {
                 suggestion = u + String.format("%03d", Rand.nextInt(1000));
@@ -100,7 +128,7 @@ private static final Pattern USERNAME_PATTERN =
             View.ShowMessage("Generated password: " + pwd);
             return pwd;
         }
-        // manual entry
+        // manual
         while (true) {
             String pwd = promptOrExit("Password: ");
             if (pwd == null) return null;
@@ -113,9 +141,7 @@ private static final Pattern USERNAME_PATTERN =
             while (true) {
                 String c = promptOrExit("Confirm password: ");
                 if (c == null) return null;
-                if (pwd.equals(c)) {
-                    return pwd;
-                }
+                if (pwd.equals(c)) return pwd;
                 View.ShowMessage("passwords don't match!");
             }
         }
@@ -129,7 +155,6 @@ private static final Pattern USERNAME_PATTERN =
         if (!pwd.chars().anyMatch(Character::isDigit))       errs.add("Missing digit");
         if (!pwd.chars().anyMatch(ch -> SPECIALS.indexOf(ch) >= 0))
             errs.add("Missing special character (" + SPECIALS + ")");
-        // check no disallowed chars: assume only those four categories allowed
         for (char ch : pwd.toCharArray()) {
             if (!Character.isLetterOrDigit(ch) && SPECIALS.indexOf(ch) < 0) {
                 errs.add("Invalid character: " + ch);
@@ -145,21 +170,18 @@ private static final Pattern USERNAME_PATTERN =
         String digits = "0123456789";
         String all = upper + lower + digits + SPECIALS;
         char[] pwd = new char[length];
-        // ensure at least one of each
+        // ensure one of each category
         pwd[0] = upper.charAt(Rand.nextInt(upper.length()));
         pwd[1] = lower.charAt(Rand.nextInt(lower.length()));
         pwd[2] = digits.charAt(Rand.nextInt(digits.length()));
         pwd[3] = SPECIALS.charAt(Rand.nextInt(SPECIALS.length()));
-        // fill rest
         for (int i = 4; i < length; i++) {
             pwd[i] = all.charAt(Rand.nextInt(all.length()));
         }
-        // shuffle
+        // Fisher–Yates shuffle
         for (int i = pwd.length - 1; i > 0; i--) {
             int j = Rand.nextInt(i + 1);
-            char tmp = pwd[i];
-            pwd[i] = pwd[j];
-            pwd[j] = tmp;
+            char t = pwd[i]; pwd[i] = pwd[j]; pwd[j] = t;
         }
         return new String(pwd);
     }

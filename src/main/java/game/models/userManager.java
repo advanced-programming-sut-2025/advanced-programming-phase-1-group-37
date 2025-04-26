@@ -18,26 +18,44 @@ public class userManager {
         loadUsers();
     }
 
-    public boolean RegisterUser(String Username,
-                                String PlainPassword,
-                                String Email,
-                                String Gender,
-                                String Nickname) {
+    /**
+     * Registers a new user including security-question index and answer.
+     * Returns false if username already exists.
+     */
+    public boolean RegisterUser(
+            String Username,
+            String PlainPassword,
+            String Email,
+            String Gender,
+            String Nickname,
+            int SecurityQuestionIndex,
+            String SecurityAnswer
+    ) {
         if (Users.containsKey(Username)) return false;
         String hash = hashPassword(PlainPassword);
-        Users.put(Username, new user(Username, hash, Email, Gender, Nickname));
+        Users.put(
+                Username,
+                new user(
+                        Username,
+                        hash,
+                        Email,
+                        Gender,
+                        Nickname,
+                        SecurityQuestionIndex,
+                        SecurityAnswer
+                )
+        );
         saveUsers();
         return true;
     }
 
+    /** Authenticates by SHA-256 hash comparison */
     public boolean Authenticate(String Username, String PlainPassword) {
         user u = Users.get(Username);
         return u != null && u.GetPasswordHash().equals(hashPassword(PlainPassword));
     }
 
-    /**
-     * Retrieves a user by username, or null if not found.
-     */
+    /** Retrieves a user by username, or null if not found */
     public user GetUser(String Username) {
         return Users.get(Username);
     }
