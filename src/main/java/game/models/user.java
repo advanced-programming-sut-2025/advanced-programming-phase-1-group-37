@@ -11,18 +11,15 @@ public class user {
     private int SecurityQuestionIndex;
     private String SecurityAnswer;
 
-    /** No-arg constructor for JSON deserialization */
     public user() {}
 
-    public user(
-            String Username,
-            String PasswordHash,
-            String Email,
-            String Gender,
-            String Nickname,
-            int SecurityQuestionIndex,
-            String SecurityAnswer
-    ) {
+    public user(String Username,
+                String PasswordHash,
+                String Email,
+                String Gender,
+                String Nickname,
+                int SecurityQuestionIndex,
+                String SecurityAnswer) {
         this.Username = Objects.requireNonNull(Username);
         this.PasswordHash = Objects.requireNonNull(PasswordHash);
         this.Email = Objects.requireNonNull(Email);
@@ -32,11 +29,11 @@ public class user {
         this.SecurityAnswer = Objects.requireNonNull(SecurityAnswer);
     }
 
-    public String GetUsername()            { return Username; }
-    public String GetPasswordHash()        { return PasswordHash; }
-    public String GetEmail()               { return Email; }
-    public String GetGender()              { return Gender; }
-    public String GetNickname()            { return Nickname; }
-    public int    GetSecurityQuestionIndex(){ return SecurityQuestionIndex; }
-    public String GetSecurityAnswer()      { return SecurityAnswer; }
+    public String   GetUsername()             { return Username; }
+    public String   GetPasswordHash()         { return PasswordHash; }
+    public String   GetEmail()                { return Email; }
+    public String   GetGender()               { return Gender; }
+    public String   GetNickname()             { return Nickname; }
+    public int      GetSecurityQuestionIndex(){ return SecurityQuestionIndex; }
+    public String   GetSecurityAnswer()       { return SecurityAnswer; }
 }

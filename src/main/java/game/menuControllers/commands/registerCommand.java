@@ -147,7 +147,7 @@ public class registerCommand implements command {
         }
     }
 
-    private List<String> validatePassword(String pwd) {
+    List<String> validatePassword(String pwd) {
         List<String> errs = new ArrayList<>();
         if (pwd.length() < MIN_LENGTH) errs.add("Password too short (min " + MIN_LENGTH + ")");
         if (!pwd.chars().anyMatch(Character::isLowerCase)) errs.add("Missing lowercase letter");

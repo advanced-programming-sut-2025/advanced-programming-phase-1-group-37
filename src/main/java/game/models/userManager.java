@@ -18,10 +18,6 @@ public class userManager {
         loadUsers();
     }
 
-    /**
-     * Registers a new user including security-question index and answer.
-     * Returns false if username already exists.
-     */
     public boolean RegisterUser(
             String Username,
             String PlainPassword,
@@ -33,39 +29,43 @@ public class userManager {
     ) {
         if (Users.containsKey(Username)) return false;
         String hash = hashPassword(PlainPassword);
-        Users.put(
-                Username,
-                new user(
-                        Username,
-                        hash,
-                        Email,
-                        Gender,
-                        Nickname,
-                        SecurityQuestionIndex,
-                        SecurityAnswer
-                )
-        );
+        Users.put(Username, new user(
+                Username, hash, Email, Gender, Nickname,
+                SecurityQuestionIndex, SecurityAnswer
+        ));
         saveUsers();
         return true;
     }
 
-    /** Authenticates by SHA-256 hash comparison */
     public boolean Authenticate(String Username, String PlainPassword) {
         user u = Users.get(Username);
         return u != null && u.GetPasswordHash().equals(hashPassword(PlainPassword));
     }
 
-    /** Retrieves a user by username, or null if not found */
     public user GetUser(String Username) {
         return Users.get(Username);
+    }
+
+    /** Resets the user’s password to a new one‐way‐hashed value. */
+    public boolean ResetPassword(String Username, String PlainPassword) {
+        user old = Users.get(Username);
+        if (old == null) return false;
+        String hash = hashPassword(PlainPassword);
+        Users.put(Username, new user(
+                old.GetUsername(), hash,
+                old.GetEmail(), old.GetGender(), old.GetNickname(),
+                old.GetSecurityQuestionIndex(), old.GetSecurityAnswer()
+        ));
+        saveUsers();
+        return true;
     }
 
     private void loadUsers() {
         File f = new File(USER_FILE);
         if (!f.exists()) return;
         try (Reader r = new FileReader(f)) {
-            Type type = new TypeToken<Map<String, user>>(){}.getType();
-            Map<String, user> loaded = gson.fromJson(r, type);
+            Type t = new TypeToken<Map<String, user>>(){}.getType();
+            Map<String, user> loaded = gson.fromJson(r, t);
             if (loaded != null) Users.putAll(loaded);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load users.json", e);
@@ -83,12 +83,12 @@ public class userManager {
     private String hashPassword(String pwd) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(pwd.getBytes());
-            StringBuilder hex = new StringBuilder();
-            for (byte b : digest) hex.append(String.format("%02x", b));
-            return hex.toString();
+            byte[] dig = md.digest(pwd.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : dig) sb.append(String.format("%02x", b));
+            return sb.toString();
         } catch (Exception e) {
-            throw new RuntimeException("SHA-256 unavailable", e);
+            throw new RuntimeException("SHA-256 not available", e);
         }
     }
 }

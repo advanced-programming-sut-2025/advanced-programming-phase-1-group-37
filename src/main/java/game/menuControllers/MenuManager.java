@@ -25,31 +25,36 @@ public class MenuManager {
         this.AuthMenu = BuildAuthMenu();
         this.MainMenu = BuildMainMenu();
 
+        // start in login/register
         this.CurrentMenu = AuthMenu;
-        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+        View.DisplayMenu(CurrentMenu.GetMenuName(),
+                CurrentMenu.GetCommands().keySet());
     }
 
     private Menu BuildAuthMenu() {
-        Map<String, command> Commands = new LinkedHashMap<>();
-        Commands.put("register",   new registerCommand(Users, View));
-        Commands.put("login",      new loginCommand(Users, View, this));
-        Commands.put("enter menu", new enterMenuCommand(this, View));
-        Commands.put("exit",       new ExitCommand());
-        return new Menu("Login/Register", Commands);
+        Map<String, command> cmds = new LinkedHashMap<>();
+        cmds.put("register",        new registerCommand(Users, View));
+        cmds.put("login",           new loginCommand(Users, View, this));
+        cmds.put("forget password", new forgetPasswordCommand(Users, View));
+        cmds.put("enter menu",      new enterMenuCommand(this, View));
+        cmds.put("exit",            new ExitCommand());
+        return new Menu("Login/Register", cmds);
     }
 
     private Menu BuildMainMenu() {
-        Map<String, command> Commands = new LinkedHashMap<>();
-        Commands.put("enter menu", new enterMenuCommand(this, View));
-        Commands.put("menu",       new showCurrentMenuCommand(this, View));
-        // add other main‐menu commands here
-        Commands.put("exit",       new ExitCommand());
-        return new Menu("Main", Commands);
+        Map<String, command> cmds = new LinkedHashMap<>();
+        cmds.put("enter menu", new enterMenuCommand(this, View));
+        cmds.put("menu",       new showCurrentMenuCommand(this, View));
+        // … other main‐menu commands …
+        cmds.put("exit",       new ExitCommand());
+        return new Menu("Main", cmds);
     }
 
+    /** Called by loginCommand on success */
     public void SwitchToMainMenu() {
         this.CurrentMenu = MainMenu;
-        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+        View.DisplayMenu(CurrentMenu.GetMenuName(),
+                CurrentMenu.GetCommands().keySet());
     }
 
     public void EnterMenu(String name) {
@@ -60,7 +65,8 @@ public class MenuManager {
                 View.ShowMessage("you can't go there from here!");
             } else {
                 CurrentMenu = MainMenu;
-                View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+                View.DisplayMenu(CurrentMenu.GetMenuName(),
+                        CurrentMenu.GetCommands().keySet());
             }
         } else {
             View.ShowMessage("menu doesn't exist!");
@@ -68,12 +74,12 @@ public class MenuManager {
     }
 
     public void Start() {
-        boolean Running = true;
-        while (Running) {
-            String Line = View.Prompt("> ");
-            command Cmd = CurrentMenu.GetCommands().get(Line.trim());
-            if (Cmd != null) {
-                Running = Cmd.Execute(new String[]{ Line });
+        boolean running = true;
+        while (running) {
+            String line = View.Prompt("> ");
+            command cmd = CurrentMenu.GetCommands().get(line.trim());
+            if (cmd != null) {
+                running = cmd.Execute(new String[]{ line });
             } else {
                 View.ShowMessage("invalid command!");
             }
