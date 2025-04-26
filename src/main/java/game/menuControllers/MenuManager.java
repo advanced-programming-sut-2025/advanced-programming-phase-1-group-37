@@ -22,6 +22,11 @@ public class MenuManager {
     private final Menu MainMenu;
     private final Menu ProfileMenu;
 
+    private static final List<String> REGISTER_LOGIN_MENUS = List.of();
+    private static final List<String> MAIN_MENUS = List.of("game", "profile", "avatar");
+    private static final List<String> PROFILE_MENUS = List.of("main");
+    private static final List<String> ALL_MENUS = List.of("register/login", "main", "game", "profile", "avatar");
+
     public MenuManager(MenuView View, userManager Users) {
         this.View  = View;
         this.Users = Users;
@@ -85,39 +90,107 @@ public class MenuManager {
         String cur = CurrentMenu.GetMenuName();
 
         if ("Login/Register".equals(cur)) {
-            if (matchesAny(name, "main", "game", "profile", "avatar", "register/login")) {
-                View.ShowMessage("you can't go there from here!");
-            } else {
-                View.ShowMessage("menu doesn't exist!");
+            if (REGISTER_LOGIN_MENUS.contains(name)) {
+                return;
             }
-            return;
+
+            else if (name.equals("register/login")) {
+                View.ShowMessage("you are already in this menu");
+                return;
+            }
+
+            else if (ALL_MENUS.contains(name)) {
+                View.ShowMessage("you can't go there from here!");
+                return;
+            }
+
+            else {
+                View.ShowMessage("menu doesn't exist!");
+                return;
+            }
+//            if (matchesAny(name, "main", "game", "profile", "avatar", "register/login")) {
+//                View.ShowMessage("you can't go there from here!");
+//            } else {
+//                View.ShowMessage("menu doesn't exist!");
+//            }
+//            return;
         }
 
         if ("Main".equals(cur)) {
-            switch (name.toLowerCase()) {
-                case "profile":
-                    SwitchToProfileMenu(); return;
-                case "game":
-                case "avatar":
-                    View.ShowMessage("you can't go there from here!");
-                    return;
-                case "main":
-                case "register/login":
-                    View.ShowMessage("you can't go there from here!");
-                    return;
-                default:
-                    View.ShowMessage("menu doesn't exist!");
-                    return;
+            if (MAIN_MENUS.contains(name)) {
+                switch (name) {
+                    case "game":
+                        return;
+
+                    case "profile":
+                        SwitchToProfileMenu();
+                        return;
+
+                    case "avatar":
+                        return;
+                }
             }
+
+            else if (name.equals("main")) {
+                View.ShowMessage("you are already in this menu");
+                return;
+            }
+
+            else if (ALL_MENUS.contains(name)) {
+                View.ShowMessage("you can't go there from here!");
+                return;
+            }
+
+            else {
+                View.ShowMessage("menu doesn't exist!");
+                return;
+            }
+//            switch (name.toLowerCase()) {
+//                case "profile":
+//                    SwitchToProfileMenu(); return;
+//                case "game":
+//                case "avatar":
+//                    View.ShowMessage("you can't go there from here!");
+//                    return;
+//                case "main":
+//                case "register/login":
+//                    View.ShowMessage("you can't go there from here!");
+//                    return;
+//                default:
+//                    View.ShowMessage("menu doesn't exist!");
+//                    return;
+//            }
         }
 
         if ("Profile".equals(cur)) {
-            // Profile Menu allows entering only "main"
-            if ("main".equalsIgnoreCase(name)) {
-                SwitchToMainMenu();
-            } else {
-                View.ShowMessage("you can't go there from here!");
+            if (PROFILE_MENUS.contains(name)) {
+                switch (name) {
+                    case "main":
+                        SwitchToMainMenu();
+                        return;
+                }
             }
+
+            else if (name.equals("profile")) {
+                View.ShowMessage("you are already in this menu");
+                return;
+            }
+
+            else if (ALL_MENUS.contains(name)) {
+                View.ShowMessage("you can't go there from here!");
+                return;
+            }
+
+            else {
+                View.ShowMessage("menu doesn't exist!");
+                return;
+            }
+
+//            if ("main".equals(name)) {
+//                SwitchToMainMenu();
+//            } else {
+//                View.ShowMessage("you can't go there from here!");
+//            }
         }
     }
 
