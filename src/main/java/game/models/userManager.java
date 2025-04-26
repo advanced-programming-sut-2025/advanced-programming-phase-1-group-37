@@ -15,7 +15,7 @@ public class userManager {
     private final Gson gson = new Gson();
 
     public userManager() {
-        LoadUsers();
+        loadUsers();
     }
 
     public boolean RegisterUser(String Username,
@@ -24,19 +24,25 @@ public class userManager {
                                 String Gender,
                                 String Nickname) {
         if (Users.containsKey(Username)) return false;
-        String hash = HashPassword(PlainPassword);
+        String hash = hashPassword(PlainPassword);
         Users.put(Username, new user(Username, hash, Email, Gender, Nickname));
-        SaveUsers();
+        saveUsers();
         return true;
     }
 
     public boolean Authenticate(String Username, String PlainPassword) {
-        user User = Users.get(Username);
-        if (User == null) return false;
-        return User.GetPasswordHash().equals(HashPassword(PlainPassword));
+        user u = Users.get(Username);
+        return u != null && u.GetPasswordHash().equals(hashPassword(PlainPassword));
     }
 
-    private void LoadUsers() {
+    /**
+     * Retrieves a user by username, or null if not found.
+     */
+    public user GetUser(String Username) {
+        return Users.get(Username);
+    }
+
+    private void loadUsers() {
         File f = new File(USER_FILE);
         if (!f.exists()) return;
         try (Reader r = new FileReader(f)) {
@@ -48,7 +54,7 @@ public class userManager {
         }
     }
 
-    private void SaveUsers() {
+    private void saveUsers() {
         try (Writer w = new FileWriter(USER_FILE)) {
             gson.toJson(Users, w);
         } catch (IOException e) {
@@ -56,10 +62,10 @@ public class userManager {
         }
     }
 
-    private String HashPassword(String Password) {
+    private String hashPassword(String pwd) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(Password.getBytes());
+            byte[] digest = md.digest(pwd.getBytes());
             StringBuilder hex = new StringBuilder();
             for (byte b : digest) hex.append(String.format("%02x", b));
             return hex.toString();
