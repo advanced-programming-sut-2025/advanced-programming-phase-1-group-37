@@ -2,6 +2,7 @@
 package game.menuControllers;
 
 import game.menuControllers.commands.*;
+import game.models.user;
 import game.models.userManager;
 import game.view.MenuView;
 
@@ -17,13 +18,17 @@ public class MenuManager {
     private final userManager Users;
     private Menu CurrentMenu;
     private String CurrentUser;
+    private List<user> CurrentGamePlayers;
 
     private final Menu AuthMenu;
     private final Menu MainMenu;
+    private final Menu GameMenu;
     private final Menu ProfileMenu;
+    private final Menu MapMenu;
 
     private static final List<String> REGISTER_LOGIN_MENUS = List.of();
     private static final List<String> MAIN_MENUS = List.of("game", "profile", "avatar");
+    private static final List<String> GAME_MENUS = List.of();
     private static final List<String> PROFILE_MENUS = List.of("main");
     private static final List<String> ALL_MENUS = List.of("register/login", "main", "game", "profile", "avatar");
 
@@ -33,7 +38,9 @@ public class MenuManager {
 
         this.AuthMenu    = buildAuthMenu();
         this.MainMenu    = buildMainMenu();
+        this.GameMenu    = buildGameMenu();
         this.ProfileMenu = buildProfileMenu();
+        this.MapMenu     = buildMapMenu();
 
         this.CurrentMenu = AuthMenu;
         View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
@@ -59,6 +66,17 @@ public class MenuManager {
         return new Menu("Main", cmds);
     }
 
+    private Menu buildGameMenu() {
+        Map<String, command> cmds = new LinkedHashMap<>();
+        cmds.put("new game",    new newGameCommand(Users, View, this));   // New game command
+        //cmds.put("load game",   new loadGameCommand(Users, View, this));  // Load game command
+        cmds.put("load game",   new loadGameCommand());
+        cmds.put("enter menu",  new enterMenuCommand(this, View));        // Enter menu command
+        cmds.put("show menu",   new showCurrentMenuCommand(this, View));  // Show menu command
+        cmds.put("exit",        new ExitCommand());                       // Exit command
+        return new Menu("Game", cmds);
+    }
+
     private Menu buildProfileMenu() {
         Map<String, command> cmds = new LinkedHashMap<>();
         cmds.put("change username", new changeUsernameCommand(Users, View, this));
@@ -72,6 +90,13 @@ public class MenuManager {
         return new Menu("Profile", cmds);
     }
 
+    private Menu buildMapMenu() {
+        Map<String, command> cmds = new LinkedHashMap<>();
+        cmds.put("select game map", new selectGameMapCommand(View, this));
+        cmds.put("exit",            new ExitCommand());
+        return new Menu("Map Selection", cmds);
+    }
+
     public void setCurrentUser(String username) {
         this.CurrentUser = username;
     }
@@ -81,8 +106,18 @@ public class MenuManager {
         View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
     }
 
+    public void SwitchToGameMenu() {
+        this.CurrentMenu = GameMenu;
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+    }
+
     public void SwitchToProfileMenu() {
         this.CurrentMenu = ProfileMenu;
+        View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
+    }
+
+    public void SwitchToMapMenu() {
+        this.CurrentMenu = MapMenu;
         View.DisplayMenu(CurrentMenu.GetMenuName(), CurrentMenu.GetCommands().keySet());
     }
 
@@ -120,6 +155,7 @@ public class MenuManager {
             if (MAIN_MENUS.contains(name)) {
                 switch (name) {
                     case "game":
+                        SwitchToGameMenu();
                         return;
 
                     case "profile":
@@ -192,14 +228,35 @@ public class MenuManager {
 //                View.ShowMessage("you can't go there from here!");
 //            }
         }
+
+        if ("Game".equals(cur)) {
+            if (GAME_MENUS.contains(name)) {
+                return;
+            }
+
+            else if (name.equals("game")) {
+                View.ShowMessage("you are already in this menu");
+                return;
+            }
+
+            else if (ALL_MENUS.contains(name)) {
+                View.ShowMessage("you can't go there from here!");
+                return;
+            }
+
+            else {
+                View.ShowMessage("menu doesn't exist!");
+                return;
+            }
+        }
     }
 
-    private boolean matchesAny(String input, String... options) {
-        for (String o : options) {
-            if (o.equalsIgnoreCase(input)) return true;
-        }
-        return false;
-    }
+//    private boolean matchesAny(String input, String... options) {
+//        for (String o : options) {
+//            if (o.equalsIgnoreCase(input)) return true;
+//        }
+//        return false;
+//    }
 
     public void Logout() {
         try { Files.deleteIfExists(Path.of("session.txt")); }
@@ -230,5 +287,13 @@ public class MenuManager {
     /** Returns the currently logged-in username */
     public String getCurrentUser() {
         return CurrentUser;
+    }
+
+    public void setCurrentGamePlayers(List<user> players) {
+        this.CurrentGamePlayers = players;
+    }
+
+    public List<user> getCurrentGamePlayers() {
+        return CurrentGamePlayers;
     }
 }

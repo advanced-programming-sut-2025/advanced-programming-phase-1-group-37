@@ -30,6 +30,8 @@ public class enterMenuCommand implements command {
             available = Collections.emptyList();
         } else if ("Main".equals(current)) {
             available = MAIN_MENUS;
+        } else if ("game".equals(current)) {
+            available = Collections.emptyList();
         } else if ("Profile".equals(current)) {
             available = PROFILE_MENUS;
         } else {
