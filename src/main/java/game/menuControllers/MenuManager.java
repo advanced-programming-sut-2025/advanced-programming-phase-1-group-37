@@ -1,6 +1,7 @@
 // src/main/java/game/menuControllers/MenuManager.java
 package game.menuControllers;
 
+import game.core.GameEngine;
 import game.menuControllers.commands.*;
 import game.models.user;
 import game.models.userManager;
@@ -17,7 +18,8 @@ public class MenuManager {
     private final MenuView View;
     private final userManager Users;
     private Menu CurrentMenu;
-    private String CurrentUser;
+//    private String CurrentUser;
+    private user CurrentUser;
     private List<user> CurrentGamePlayers;
 
     private final Menu AuthMenu;
@@ -70,7 +72,7 @@ public class MenuManager {
         Map<String, command> cmds = new LinkedHashMap<>();
         cmds.put("new game",    new newGameCommand(Users, View, this));   // New game command
         //cmds.put("load game",   new loadGameCommand(Users, View, this));  // Load game command
-        cmds.put("load game",   new loadGameCommand());
+        cmds.put("load game",   new loadGameCommand(Users, this, View));
         cmds.put("enter menu",  new enterMenuCommand(this, View));        // Enter menu command
         cmds.put("show menu",   new showCurrentMenuCommand(this, View));  // Show menu command
         cmds.put("exit",        new ExitCommand());                       // Exit command
@@ -98,7 +100,11 @@ public class MenuManager {
     }
 
     public void setCurrentUser(String username) {
-        this.CurrentUser = username;
+//        this.CurrentUser = username;
+        this.CurrentUser = Users.GetUser(username);
+//        if (CurrentUser != null) {
+//            System.out.println(CurrentUser.GetUsername());
+//        }
     }
 
     public void SwitchToMainMenu() {
@@ -286,7 +292,7 @@ public class MenuManager {
 
     /** Returns the currently logged-in username */
     public String getCurrentUser() {
-        return CurrentUser;
+        return CurrentUser.GetUsername();
     }
 
     public void setCurrentGamePlayers(List<user> players) {

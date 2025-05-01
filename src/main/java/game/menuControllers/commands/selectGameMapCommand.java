@@ -1,14 +1,18 @@
 package game.menuControllers.commands;
 
+import game.core.GameEngine;
+import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.user;
 import game.view.MenuView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class selectGameMapCommand implements command {
     private final MenuView View;
     private final MenuManager Menus;
+    private final List<Integer> Choices = new ArrayList<Integer>();
     private static final int MAX_MAPS = 10;
 
     public selectGameMapCommand(MenuView view, MenuManager menus) {
@@ -31,13 +35,12 @@ public class selectGameMapCommand implements command {
             while (true) {
                 String In = PromptOrExit(Player.GetUsername() + " map: ");
                 if (In == null) {
-//                    Menus.SwitchToMapMenu();
                     return true;
                 }
                 try {
                     int Choice = Integer.parseInt(In);
                     if (Choice >= 1 && Choice <= MAX_MAPS) {
-//                        View.ShowMessage(Player.GetUsername() + " chose map " + Choice + ".");
+                        Choices.add(Choice);
                         break;
                     } else {
                         View.ShowMessage("Invalid map number! Must be 1 to " + MAX_MAPS + ".");
@@ -48,9 +51,19 @@ public class selectGameMapCommand implements command {
             }
         }
 
-        View.ShowMessage("All maps selected. Starting game…");
-        // TODO: actually start the turn‐based loop…
+        gameSession GameSession = GameEngine.GetCurrentGameSession();
+        int size = Players.size();
+        for (int i = 0; i < size; i++) {
+            GameSession.GetInfo().SetPlayerMap(Players.get(i), Choices.get(i));
+        }
+
+        /**
+         * change this later
+         */
+        Menus.SwitchToMainMenu();
+
         return true;
+
     }
 
     private String PromptOrExit(String Prompt) {

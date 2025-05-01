@@ -1,5 +1,7 @@
 package game.models;
 
+import game.gameSession.gameSession;
+
 import java.util.Objects;
 
 public class user {
@@ -12,6 +14,7 @@ public class user {
     private String SecurityAnswer;
     private long HighestBalance = 0;
     private int NumberOfGamesPlayed = 0;
+    private gameSession CurrentGameSession;
 
     public user() {}
 
@@ -40,4 +43,8 @@ public class user {
     public String   GetSecurityAnswer()       { return SecurityAnswer; }
     public long   GetHighestBalance() { return HighestBalance; }
     public int   GetNumberOfGamesPlayed() { return NumberOfGamesPlayed; }
+    public gameSession GetCurrentGameSession() { return CurrentGameSession; }
+    public void SetCurrentGameSession(gameSession CurrentGameSession) {
+        this.CurrentGameSession = CurrentGameSession;
+    }
 }

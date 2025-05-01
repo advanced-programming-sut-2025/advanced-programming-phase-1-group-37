@@ -1,5 +1,7 @@
 package game.menuControllers.commands;
 
+import game.core.GameEngine;
+import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.user;
 import game.models.userManager;
@@ -43,6 +45,9 @@ public class newGameCommand implements command {
         }
 
         // Proceed with the game logic here...
+        gameSession GameSession = new gameSession(PlayersInGame, Users.GetUser(player1));
+        GameEngine.SetCurrentGameSession(GameSession);
+        AddGameSessionForPlayers(PlayersInGame, GameSession);
         Menus.setCurrentGamePlayers(PlayersInGame);
         Menus.SwitchToMapMenu();
         return true;
@@ -106,5 +111,11 @@ public class newGameCommand implements command {
             }
         }
         return false;
+    }
+
+    private void AddGameSessionForPlayers(List<user> players, gameSession GameSession) {
+        for (user User : players) {
+            User.SetCurrentGameSession(GameSession);
+        }
     }
 }

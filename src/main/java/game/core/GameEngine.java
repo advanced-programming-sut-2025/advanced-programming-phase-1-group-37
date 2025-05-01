@@ -1,5 +1,6 @@
 package game.core;
 
+import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.userManager;
 import game.view.MenuView;
@@ -10,10 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class GameEngine {
+    private static gameSession CurrentGameSession;
+
     public static void main(String[] args) throws Exception {
         userManager users = new userManager();
-        MenuView view    = new consoleMenuView();
-        MenuManager menus= new MenuManager(view, users);
+        MenuView view = new consoleMenuView();
+        MenuManager menus = new MenuManager(view, users);
+
 
         // Auto‐login if session.txt exists
         Path session = Path.of("session.txt");
@@ -27,5 +31,13 @@ public class GameEngine {
         }
 
         menus.Start();
+    }
+
+    public static void SetCurrentGameSession(gameSession currentGameSession) {
+        CurrentGameSession = currentGameSession;
+    }
+
+    public static gameSession GetCurrentGameSession() {
+        return CurrentGameSession;
     }
 }
