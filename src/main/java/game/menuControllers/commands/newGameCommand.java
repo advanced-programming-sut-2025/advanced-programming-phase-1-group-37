@@ -5,6 +5,7 @@ import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.user;
 import game.models.userManager;
+import game.time.TimeSystem;
 import game.view.MenuView;
 
 import java.util.ArrayList;
@@ -14,12 +15,14 @@ public class newGameCommand implements command {
     private final userManager Users;
     private final MenuView View;
     private final MenuManager Menus;
+    private final TimeSystem Clock;
     private List<user> PlayersInGame = new ArrayList<>();
 
-    public newGameCommand(userManager users, MenuView view, MenuManager menus) {
+    public newGameCommand(userManager users, MenuView view, MenuManager menus, TimeSystem time) {
         this.Users = users;
         this.View = view;
         this.Menus = menus;
+        this.Clock = time;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class newGameCommand implements command {
         }
 
         // Proceed with the game logic here...
-        gameSession GameSession = new gameSession(PlayersInGame, Users.GetUser(player1));
+        gameSession GameSession = new gameSession(PlayersInGame, Users.GetUser(player1), Clock);
         GameEngine.SetCurrentGameSession(GameSession);
         AddGameSessionForPlayers(PlayersInGame, GameSession);
         Menus.setCurrentGamePlayers(PlayersInGame);

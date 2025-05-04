@@ -1,8 +1,10 @@
 package game.core;
 
+import game.gameSession.gameController;
 import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.userManager;
+import game.time.TimeSystem;
 import game.view.MenuView;
 import game.view.consoleMenuView;
 
@@ -11,14 +13,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class GameEngine {
+    private static userManager users = new userManager();
+//    private static MenuView view = new consoleMenuView();
+    private static MenuManager menus = new MenuManager(users);
+//    private static MenuManager menus;
     private static gameSession CurrentGameSession;
+    private static TimeSystem clock = new TimeSystem();
+//    private static gameController GameController = new gameController(view, clock);
 
     public static void main(String[] args) throws Exception {
-        userManager users = new userManager();
-        MenuView view = new consoleMenuView();
-        MenuManager menus = new MenuManager(view, users);
-
-
+//        GameController.SetMenuManager(menus);
+//        menus.SetGameController(GameController);
+        MenuView view = menus.GetView();
         // Auto‐login if session.txt exists
         Path session = Path.of("session.txt");
         if (Files.exists(session)) {

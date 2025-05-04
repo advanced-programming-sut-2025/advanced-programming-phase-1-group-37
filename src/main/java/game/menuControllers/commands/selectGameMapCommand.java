@@ -1,9 +1,11 @@
 package game.menuControllers.commands;
 
 import game.core.GameEngine;
+import game.gameSession.gameController;
 import game.gameSession.gameSession;
 import game.menuControllers.MenuManager;
 import game.models.user;
+import game.models.userManager;
 import game.view.MenuView;
 
 import java.util.ArrayList;
@@ -12,16 +14,20 @@ import java.util.List;
 public class selectGameMapCommand implements command {
     private final MenuView View;
     private final MenuManager Menus;
+    private final userManager Users;
+    private gameController GameController;
     private final List<Integer> Choices = new ArrayList<Integer>();
     private static final int MAX_MAPS = 10;
 
-    public selectGameMapCommand(MenuView view, MenuManager menus) {
+    public selectGameMapCommand(MenuView view, MenuManager menus, userManager users) {
         this.View  = view;
         this.Menus = menus;
+        this.Users = users;
     }
 
     @Override
     public boolean Execute(String[] Args) {
+        GameController = Menus.GetGameController();
         List<user> Players = Menus.getCurrentGamePlayers();
         if (Players == null || Players.isEmpty()) {
             View.ShowMessage("No game in progress.");
@@ -57,10 +63,8 @@ public class selectGameMapCommand implements command {
             GameSession.GetInfo().SetPlayerMap(Players.get(i), Choices.get(i));
         }
 
-        /**
-         * change this later
-         */
-        Menus.SwitchToMainMenu();
+        GameController.LoadSession(GameEngine.GetCurrentGameSession(), Users.GetUser(Menus.getCurrentUser()));
+        Menus.SwitchToInGameMenu();
 
         return true;
 

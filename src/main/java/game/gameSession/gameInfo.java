@@ -1,6 +1,7 @@
 package game.gameSession;
 
 import game.models.user;
+import game.time.TimeSystem;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,9 +23,12 @@ public class gameInfo {
      */
     private final Map<user,Integer> PlayersMaps = new LinkedHashMap<>();
 
-    public gameInfo(List<user> Players, user Creator) {
+    private final TimeSystem Clock;
+
+    public gameInfo(List<user> Players, user Creator, TimeSystem clock) {
         this.Players    = Players;
         this.MainPlayer = Creator;
+        this.Clock = clock;
     }
 
     /** Unmodifiable list of players */
@@ -59,5 +63,9 @@ public class gameInfo {
     /** Immutable view of all map selections */
     public Map<user,Integer> GetPlayersMaps() {
         return Map.copyOf(PlayersMaps);
+    }
+
+    public TimeSystem GetClock() {
+        return Clock;
     }
 }

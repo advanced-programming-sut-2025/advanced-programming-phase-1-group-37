@@ -16,9 +16,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- ↓ add (or create) this section ↓ -->
     <dependencies>
-        <!-- GSON for JSON serialization (users.json) -->
+        <!-- GSON for JSON serialization/deserialization -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
