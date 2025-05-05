@@ -81,10 +81,18 @@ public class exitGameCommand implements command {
          */
 
         // Serialize the DTO to disk
-        String filename = mainPlayer + "_save.json";
-        try (Writer writer = new FileWriter(filename)) {
+        String FileName;
+        if(GameEngine.GetCurrentSaveFileName() != null) {
+            FileName = GameEngine.GetCurrentSaveFileName();
+        }
+        else {
+            FileName = mainPlayer + "_save";
+        }
+        String Path = FileName + ".json";
+//        String filename = mainPlayer + "_save.json";
+        try (Writer writer = new FileWriter(Path)) {
             Gson.toJson(dto, writer);
-            View.ShowMessage("Game saved to " + filename + "!");
+            View.ShowMessage("Game saved to " + FileName);
         } catch (IOException e) {
             View.ShowMessage("Failed to save game: " + e.getMessage());
         }

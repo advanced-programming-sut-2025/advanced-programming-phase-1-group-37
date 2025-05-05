@@ -114,7 +114,7 @@ public class MenuManager {
         cmds.put("day of the week", new dayCommand(Clock, View));
         cmds.put("season",          new seasonCommand(Clock, View));
         cmds.put("exit game",       new exitGameCommand(this, View, GameController));
-        cmds.put("force terminate", new forceTerminateCommand(this, View));
+        cmds.put("force terminate", new forceTerminateCommand(this, View, GameController));
         cmds.put("next turn",       new nextTurnCommand(GameController));
         return new Menu("In-Game", cmds);
     }

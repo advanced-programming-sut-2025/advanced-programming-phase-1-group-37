@@ -85,8 +85,16 @@ public class gameController {
 
     private void StartTurn() {
         user player = Session.GetInfo().GetPlayers().get(currentPlayerIndex);
-        Session.GetInfo().SetMainPlayer(player);
+        /**
+         System.out.println("index is : " + currentPlayerIndex);
+         */
+
         Menus.setCurrentUser(player.GetUsername());
+        /**
+         * this might be needed later
+         * Session.GetInfo().SetMainPlayer(player);
+         */
+
         View.ShowMessage(
                 "=== " + player.GetUsername() +
                         "'s turn (" + Time.Now() + ") ==="

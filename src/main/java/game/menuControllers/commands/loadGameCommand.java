@@ -48,8 +48,8 @@ public class loadGameCommand implements command {
             return true;
         }
 
-        String FileName = input + ".json";
-        File file = new File(FileName);
+        String FileName = input;
+        File file = new File(FileName + ".json");
         if (!file.exists()) {
             View.ShowMessage("Save file \"" + FileName + "\" not found.");
             return true;
@@ -68,6 +68,9 @@ public class loadGameCommand implements command {
             return true;
         }
 
+//        dto.FileName = FileName;
+        GameEngine.SetCurrentSaveFileName(FileName);
+
         // Rebuild player list
         List<user> players = dto.Players.stream()
                 .map(Users::GetUser)
@@ -80,7 +83,7 @@ public class loadGameCommand implements command {
         TimeSystem Clock = new TimeSystem(dto.Day, dto.Hour, dto.Minute);
 
         // Construct new session
-        gameSession session = new gameSession(players, Users.GetUser(dto.MainPlayer), Clock);
+        gameSession session = new gameSession(players, Users.GetUser(Menus.getCurrentUser()), Clock);
 
         /**
          System.out.println("hour from save is : " + dto.Hour);
@@ -101,7 +104,7 @@ public class loadGameCommand implements command {
         // Install the session globally
         GameEngine.SetCurrentGameSession(session);
 
-        View.ShowMessage("Loaded \"" + FileName + "\" as main player: " + dto.MainPlayer);
+        View.ShowMessage("Loaded \"" + FileName + "\" as main player: " + Menus.getCurrentUser());
 
         // Begin in-game loop
         Controller.LoadSession(session, Users.GetUser(Menus.getCurrentUser()));

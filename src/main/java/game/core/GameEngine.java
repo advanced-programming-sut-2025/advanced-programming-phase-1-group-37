@@ -20,6 +20,7 @@ public class GameEngine {
     private static gameSession CurrentGameSession;
     private static TimeSystem clock = new TimeSystem();
 //    private static gameController GameController = new gameController(view, clock);
+    private static String FileName = null;
 
     public static void main(String[] args) throws Exception {
 //        GameController.SetMenuManager(menus);
@@ -45,5 +46,13 @@ public class GameEngine {
 
     public static gameSession GetCurrentGameSession() {
         return CurrentGameSession;
+    }
+
+    public static void SetCurrentSaveFileName(String fileName) {
+        FileName = fileName;
+    }
+
+    public static String GetCurrentSaveFileName() {
+        return FileName;
     }
 }
