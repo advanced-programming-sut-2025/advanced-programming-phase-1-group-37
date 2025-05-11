@@ -1,4 +1,5 @@
 package main;
+import main.construction.Construction;
 import main.weather.Greenhouse;
 import main.weather.StormWeather;
 import main.weather.Weather;
@@ -15,6 +16,9 @@ public class Main {
     public static void main(String[] args){
 
         Scanner input=new Scanner(System.in);
+
+        Construction.ListItems();
+
 
         while(true){
 
