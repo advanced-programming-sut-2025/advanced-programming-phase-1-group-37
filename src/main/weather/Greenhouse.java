@@ -13,7 +13,7 @@ public class Greenhouse{
 
 
 
-    public static void build() {
+    public static void Build() {
 
         if ((player_coin > 1000) && (player_wood > 500)) {
             player_coin -= 1000;
