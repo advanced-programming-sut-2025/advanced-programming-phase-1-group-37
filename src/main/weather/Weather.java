@@ -5,9 +5,9 @@ public class Weather {
 
     public static String today_weather;
     public static String tomorrow_weather;
-public static String season;
+    public static String season;
     public static int hour;
-    public  static int consuming_energy_amount;
+    public static int consuming_energy_amount;
     public static int today_consuming_energy_amount;
 
     static Random rand=new Random(4);
