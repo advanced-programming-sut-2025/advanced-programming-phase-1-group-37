@@ -1,6 +1,7 @@
 package main;
 import main.construction.Construction;
 import main.construction.CraftingController;
+import main.construction.CraftingViews;
 import main.weather.Greenhouse;
 import main.weather.StormWeather;
 import main.weather.Weather;
@@ -55,9 +56,14 @@ public class Main {
             }
 
             else if(command.equals("crafting show recipes")){
-                CraftingController craftingController=new CraftingController();
-                craftingController.showRecipes();
+                if(CraftingController.IsPlayerInHouse()){
+                    CraftingController.showRecipes();
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
             }
+
 
 
         }

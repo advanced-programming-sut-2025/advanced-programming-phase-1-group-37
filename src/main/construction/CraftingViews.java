@@ -8,5 +8,11 @@ public class CraftingViews {
 
     }
 
+    public static void NotPlayerInHouse(){
+
+        System.out.println("You are not in house");
+
+    }
+
 
 }
