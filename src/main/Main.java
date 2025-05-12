@@ -3,6 +3,7 @@ import main.construction.Construction;
 import main.construction.Crafting;
 import main.construction.CraftingController;
 import main.construction.CraftingViews;
+import main.cooking.Cooking;
 import main.weather.Greenhouse;
 import main.weather.StormWeather;
 import main.weather.Weather;
@@ -21,7 +22,7 @@ public class Main {
         Scanner input=new Scanner(System.in);
 
         Construction.ListItems();
-
+        Cooking.ListFoods();
 
         while(true){
 
