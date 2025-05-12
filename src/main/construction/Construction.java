@@ -8,7 +8,10 @@ import java.util.Map;
 public class Construction {
 
 
-    static List<Item> items=new ArrayList<>();
+    public static List<Item> items=new ArrayList<>();
+
+    public static Map<Item,Integer> player_inventory;
+
 
     public static void ListItems(){
 
@@ -38,6 +41,31 @@ public class Construction {
     }
 
 
+    public static void placeItem(String itemName, String direction) {
+
+        Set<String> validDirections = Set.of("N", "S", "E", "W", "NE", "NW", "SE", "SW");
+        if (!validDirections.contains(direction.toUpperCase())) {
+            CraftingViews.InvalidDirection();
+            return;
+        }
+
+
+        Item targetItem = null;
+        for (Item item : player_inventory.keySet()) {
+            if (item.name.equalsIgnoreCase(itemName)) {
+                targetItem = item;
+                break;
+            }
+        }
+
+
+        if (targetItem == null) {
+            CraftingViews.NotInInventory();
+            return;
+        }
+
+
+    }
 
 
 

@@ -1,5 +1,6 @@
 package main;
 import main.construction.Construction;
+import main.construction.Crafting;
 import main.construction.CraftingController;
 import main.construction.CraftingViews;
 import main.weather.Greenhouse;
@@ -62,6 +63,35 @@ public class Main {
                 else {
                     CraftingViews.NotPlayerInHouse();
                 }
+            }
+
+            else if(command.matches("crafting craft (\\S+)")){
+
+                String[] parts=command.split("\\s+");
+
+                String item_name=parts[2];
+                if(CraftingController.IsPlayerInHouse()){
+                    Crafting.craftItem(item_name);
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
+            }
+
+            else if(command.matches("place item -n (\\S+) -d (\\S+)")){
+
+                String[] parts=command.split("\\s+");
+
+                String item_name=parts[2];
+                String direction=parts[3];
+                if(CraftingController.IsPlayerInHouse()){
+                    Construction.placeItem(item_name,direction);
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
             }
 
 
