@@ -133,6 +133,37 @@ public class Crafting {
     }
 
 
+    public static void CheatAddItem(String item_name,int count){
+
+
+        Item itemToCraft = null;
+        for (Item item : Construction.items) {
+            if (item.name.equalsIgnoreCase(item_name)) {
+                itemToCraft = item;
+                break;
+            }
+        }
+
+        if (itemToCraft == null) {
+            CraftingViews.InvalidItemName();
+            return;
+        }
+
+
+        if (Construction.player_inventory.size()+count > MAX_INVENTORY_SIZE) {
+            CraftingViews.IsInventoryFull();
+            return;
+        }
+
+
+
+
+
+
+        Construction.player_inventory.put(itemToCraft, count);
+
+
+    }
 
 
 

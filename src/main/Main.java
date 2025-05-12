@@ -95,6 +95,25 @@ public class Main {
             }
 
 
+            else if(command.matches("cheat add item -n (\\S+) -c \\d+")){
+
+                String[] parts=command.split("\\s+");
+
+                String item_name=parts[4];
+
+                int count=Integer.parseInt(parts[6]);
+
+                if(CraftingController.IsPlayerInHouse()){
+                    Crafting.CheatAddItem(item_name,count);
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
+
+            }
+
+
 
         }
 
