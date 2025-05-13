@@ -21,6 +21,14 @@ public class Cooking {
     public static int mining_level;
 
 
+    public static int player_energy;
+
+    public static int MAX_INVENTORY_SIZE;
+
+
+
+
+
     public static void ListFoods(){
         Map<String, Integer> friedEggIngredients = new HashMap<>();
         friedEggIngredients.put("egg", 1);

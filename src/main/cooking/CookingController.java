@@ -3,6 +3,9 @@ package main.cooking;
 import main.construction.CraftingController;
 import main.construction.CraftingViews;
 
+import java.util.ArrayList;
+
+import static main.cooking.Cooking.foods;
 import static main.cooking.Cooking.player_inventory;
 
 public class CookingController {
@@ -33,7 +36,7 @@ public class CookingController {
 
         } else if (action.equals("pick")) {
             if (!Refrigerator.fridge_inventory.containsKey(targetFood)) {
-                CookingViews.NoyInRefrigerator();
+                CookingViews.NotInRefrigerator();
                 return;
             }
 
@@ -48,7 +51,7 @@ public class CookingController {
     }
 
     public static Food findFoodByName(String name) {
-        for (Food food : Cooking.foods){
+        for (Food food : foods){
             if (food.name.equalsIgnoreCase(name)) {
                 return food;
             }
@@ -58,7 +61,7 @@ public class CookingController {
 
 
     public static void showLearnedRecipes() {
-        for (Food food : Cooking.foods) {
+        for (Food food : foods) {
             if (hasLearnedRecipe(food)) {
                 System.out.println(food.name);
             }
@@ -84,6 +87,124 @@ public class CookingController {
             default:
                 return false;
         }
+    }
+
+
+    public static void prepareFood(String recipeName) {
+
+        Food food = null;
+        for (Food f : foods) {
+            if (f.name.equalsIgnoreCase(recipeName)) {
+                food = f;
+                break;
+            }
+        }
+
+        if (food == null) {
+            CraftingViews.InvalidItemName();
+            return;
+        }
+
+
+        if (!hasLearnedRecipe(food)) {
+            CookingViews.NotLearnedRecipe();
+            return;
+        }
+
+
+        if (!hasAllIngredients(food)) {
+            CraftingViews.NotEnoughResources();
+            return;
+        }
+
+
+        if (isInventoryFull()) {
+            CraftingViews.IsInventoryFull();
+            return;
+        }
+
+
+        consumeIngredients(food);
+
+
+        player_inventory.put(food, player_inventory.getOrDefault(food, 0) + 1);
+
+
+        Cooking.player_energy -= 3;
+
+
+    }
+
+
+    public static boolean hasAllIngredients(Food food) {
+        for (String ingredientName : food.ingredients.keySet()) {
+            int requiredAmount = food.ingredients.get(ingredientName);
+            int available = getAvailableAmount(ingredientName);
+            if (available < requiredAmount)
+                return false;
+        }
+        return true;
+    }
+
+
+    public static int getAvailableAmount(String name) {
+        int total = 0;
+
+        for (Food f : player_inventory.keySet()) {
+            if (f.name.equalsIgnoreCase(name))
+                total += player_inventory.get(f);
+        }
+        for (Food f : Refrigerator.fridge_inventory.keySet()) {
+            if (f.name.equalsIgnoreCase(name))
+                total += Refrigerator.fridge_inventory.get(f);
+        }
+
+        return total;
+    }
+
+
+    public static void consumeIngredients(Food food) {
+        for (String name : food.ingredients.keySet()) {
+            int required = food.ingredients.get(name);
+
+
+            for (Food f : new ArrayList<>(player_inventory.keySet())) {
+                if (f.name.equalsIgnoreCase(name) && required > 0) {
+                    int available = player_inventory.get(f);
+                    int toRemove = Math.min(available, required);
+                    required -= toRemove;
+                    if (toRemove == available)
+                        player_inventory.remove(f);
+                    else
+                        player_inventory.put(f, available - toRemove);
+                }
+            }
+
+
+            for (Food f : new ArrayList<>(Refrigerator.fridge_inventory.keySet())) {
+                if (f.name.equalsIgnoreCase(name) && required > 0) {
+                    int available = Refrigerator.fridge_inventory.get(f);
+                    int toRemove = Math.min(available, required);
+                    required -= toRemove;
+                    if (toRemove == available)
+                        Refrigerator.fridge_inventory.remove(f);
+                    else
+                        Refrigerator.fridge_inventory.put(f, available - toRemove);
+                }
+            }
+        }
+    }
+
+
+    public static boolean isInventoryFull() {
+
+    if(player_inventory.size() >= Cooking.MAX_INVENTORY_SIZE){
+        return true;
+    }
+    else {
+        return false;
+    }
+
     }
 
 
