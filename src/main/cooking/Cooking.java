@@ -11,6 +11,16 @@ public class Cooking {
 
     public static Map<Food,Integer> player_inventory;
 
+
+    public static boolean starter;
+    public static boolean stardrop_saloon;
+    public static boolean leah_reward;
+    public static int fishing_level;
+    public static int foraging_level;
+    public static int farming_level;
+    public static int mining_level;
+
+
     public static void ListFoods(){
         Map<String, Integer> friedEggIngredients = new HashMap<>();
         friedEggIngredients.put("egg", 1);
@@ -121,39 +131,39 @@ public class Cooking {
         Map<String, Integer> vegetableMedleyIngredients = new HashMap<>();
         vegetableMedleyIngredients.put("Tomato", 1);
         vegetableMedleyIngredients.put("Beet", 1);
-        foods.add(new Food("Vegetable Medley", vegetableMedleyIngredients, 165, null, "Foraging Level 2", 2, 120));
+        foods.add(new Food("Vegetable Medley", vegetableMedleyIngredients, 165, null, "Foraging", 2, 120));
 
 
         Map<String, Integer> farmersLunchIngredients = new HashMap<>();
         farmersLunchIngredients.put("Omelet", 1);
         farmersLunchIngredients.put("Parsnip", 1);
-        foods.add(new Food("Farmer's Lunch", farmersLunchIngredients, 200, "Farming (5 hours)", "Farming Level 1", 1, 150));
+        foods.add(new Food("Farmer's Lunch", farmersLunchIngredients, 200, "Farming (5 hours)", "Farming", 1, 150));
 
 
         Map<String, Integer> survivalBurgerIngredients = new HashMap<>();
         survivalBurgerIngredients.put("Bread", 1);
         survivalBurgerIngredients.put("Carrot", 1);
         survivalBurgerIngredients.put("Eggplant", 1);
-        foods.add(new Food("Survival Burger", survivalBurgerIngredients, 125, "Foraging (5 hours)", "Foraging Level 3", 3, 180));
+        foods.add(new Food("Survival Burger", survivalBurgerIngredients, 125, "Foraging (5 hours)", "Foraging", 3, 180));
 
 
         Map<String, Integer> dishOSeaIngredients = new HashMap<>();
         dishOSeaIngredients.put("Sardine", 2);
         dishOSeaIngredients.put("Hash Browns", 1);
-        foods.add(new Food("Dish O' the Sea", dishOSeaIngredients, 150, "Fishing (5 hours)", "Fishing Level 2", 2, 220));
+        foods.add(new Food("Dish O' the Sea", dishOSeaIngredients, 150, "Fishing (5 hours)", "Fishing", 2, 220));
 
 
         Map<String, Integer> seafoamPuddingIngredients = new HashMap<>();
         seafoamPuddingIngredients.put("Flounder", 1);
         seafoamPuddingIngredients.put("Midnight Carp", 1);
-        foods.add(new Food("Seafoam Pudding", seafoamPuddingIngredients, 175, "Fishing (10 hours)", "Fishing Level 3", 3, 300));
+        foods.add(new Food("Seafoam Pudding", seafoamPuddingIngredients, 175, "Fishing (10 hours)", "Fishing", 3, 300));
 
 
         Map<String, Integer> minersTreatIngredients = new HashMap<>();
         minersTreatIngredients.put("Carrot", 2);
         minersTreatIngredients.put("Sugar", 1);
         minersTreatIngredients.put("Milk", 1);
-        foods.add(new Food("Miner's Treat", minersTreatIngredients, 125, "Mining (5 hours)", "Mining Level 1", 1, 200));
+        foods.add(new Food("Miner's Treat", minersTreatIngredients, 125, "Mining (5 hours)", "Mining", 1, 200));
     }
 
 

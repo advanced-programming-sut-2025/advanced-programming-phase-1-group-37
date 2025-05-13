@@ -4,6 +4,7 @@ import main.construction.Crafting;
 import main.construction.CraftingController;
 import main.construction.CraftingViews;
 import main.cooking.Cooking;
+import main.cooking.CookingController;
 import main.weather.Greenhouse;
 import main.weather.StormWeather;
 import main.weather.Weather;
@@ -113,6 +114,39 @@ public class Main {
 
 
             }
+
+
+            else if(command.matches("cooking refrigerator (\\S+) (\\S+)")){
+
+                String[] parts=command.split("\\s+");
+
+                String action=parts[2];
+
+                String item_name=parts[3];
+
+                if(CraftingController.IsPlayerInHouse()){
+                    CookingController.Refrigerator(action,item_name);
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
+
+            }
+
+
+            else if(command.equals("cooking show recipes")){
+
+                if(CraftingController.IsPlayerInHouse()){
+                    CookingController.showLearnedRecipes();
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
+            }
+
+
 
 
 
