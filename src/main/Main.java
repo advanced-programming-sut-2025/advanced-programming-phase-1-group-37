@@ -147,6 +147,26 @@ public class Main {
             }
 
 
+            else if(command.matches("eat (\\S+)")){
+
+                String[] parts=command.split("\\s+");
+
+                String food_name=parts[1];
+
+
+                if(CraftingController.IsPlayerInHouse()){
+                    CookingController.eat(food_name);
+                }
+                else {
+                    CraftingViews.NotPlayerInHouse();
+                }
+
+
+            }
+
+
+
+
 
 
 

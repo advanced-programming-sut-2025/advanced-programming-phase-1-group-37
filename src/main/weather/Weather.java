@@ -10,6 +10,9 @@ public class Weather {
     public static int consuming_energy_amount;
     public static int today_consuming_energy_amount;
 
+    public static int days_passed=0;
+
+
     static Random rand=new Random(4);
 
     public static void changeWeather(){
@@ -28,6 +31,12 @@ public class Weather {
 
 
         tomorrow_weather=selectWeather(number);
+
+        days_passed++;
+
+        if(days_passed>28){
+            changeSeason();
+        }
 
         switch(today_weather){
             case "sunny":{
@@ -52,6 +61,32 @@ public class Weather {
 
     }
 
+
+    public static void changeSeason(){
+
+        switch(season){
+            case "spring":{
+                season="summer";
+                break;
+            }
+            case "summer":{
+                season="fall";
+                break;
+            }
+            case "fall":{
+                season="winter";
+                break;
+            }
+            case "winter":{
+                season="spring";
+                break;
+            }
+
+        }
+
+
+
+    }
 
 
     public static String selectWeather(int number){

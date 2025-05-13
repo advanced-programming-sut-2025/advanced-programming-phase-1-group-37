@@ -11,6 +11,11 @@ public class Cooking {
 
     public static Map<Food,Integer> player_inventory;
 
+    public static int energy = 100;
+    public static int maxEnergy = 100;
+    public static Food activeBuffFood = null;
+    public static int buffHoursRemaining = 0;
+
 
     public static boolean starter;
     public static boolean stardrop_saloon;

@@ -208,6 +208,73 @@ public class CookingController {
     }
 
 
+    public static void eat(String foodName) {
+        Food foodToEat = null;
+
+
+        for (Food food : Cooking.foods) {
+            if (food.name.equalsIgnoreCase(foodName)) {
+                foodToEat = food;
+                break;
+            }
+        }
+
+        if (foodToEat == null) {
+            CraftingViews.InvalidItemName();
+            return;
+        }
+
+
+        int count = Cooking.player_inventory.getOrDefault(foodToEat, 0);
+        if (count == 0) {
+            CraftingViews.NotInInventory();
+            return;
+        }
+
+
+        if (count == 1)
+            Cooking.player_inventory.remove(foodToEat);
+        else
+            Cooking.player_inventory.put(foodToEat, count - 1);
+
+
+        Cooking.energy += foodToEat.energy;
+        if (Cooking.energy > Cooking.maxEnergy)
+            Cooking.energy = Cooking.maxEnergy;
+
+
+        if (!foodToEat.buff.equalsIgnoreCase("none")) {
+            Cooking.activeBuffFood = foodToEat;
+            Cooking.buffHoursRemaining = 5;
+        }
+
+
+    }
+
+
+    public static int getEnergyCost(String skill) {
+        if (Cooking.activeBuffFood != null && Cooking.buffHoursRemaining > 0) {
+            if (Cooking.activeBuffFood.buff.equalsIgnoreCase(skill)) {
+                return 1; // مثلاً در حالت عادی انرژی 2 است ولی با buff فقط 1 انرژی مصرف می‌شود
+            }
+        }
+        return 2; // مصرف انرژی معمول
+    }
+
+    public static void tickBuffHour() {
+        if (Cooking.buffHoursRemaining > 0) {
+            Cooking.buffHoursRemaining--;
+
+            if (Cooking.buffHoursRemaining == 0) {
+                Cooking.activeBuffFood = null;
+            }
+        }
+    }
+
+
+
+
+
 
 
 
